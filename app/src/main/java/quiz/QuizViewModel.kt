@@ -1,32 +1,40 @@
 package quiz
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.android_lab3quiz.api.RetrofitInstance
+import kotlinx.coroutines.launch
 
 
 class QuizViewModel : ViewModel() {
-    val questions: MutableList<Question> = quiz.questions;
+    var questions: MutableLiveData<MutableList<Question>> = MutableLiveData(quiz.questions)
     var numCorrect: Int = 0
-    private val numberOfQuestions: Int = 5
-    var itQuestion: MutableIterator<Question> = doQuiz(numberOfQuestions).iterator()
+    var numberOfQuestions: Int = quiz.questions.size
+    var itQuestion: MutableIterator<Question> = quiz.questions.iterator()
     var currentQuestion: MutableLiveData<Pair<Question?, Boolean>> =
         MutableLiveData<Pair<Question?, Boolean>>()
 
+    private var selectedQuestion : MutableLiveData<Question> = MutableLiveData<Question>();
     init {
+       getQuestionsFromAPI(20)
+        numberOfQuestions = questions.value!!.size
         getNextQuestion()
+        selectQuestion(0)
     }
 
     private fun randomizeQuestions() {
-        questions.forEach { q -> q.answers.shuffle() }
-        questions.shuffle()
+        questions.value!!.forEach { q -> q.answers.shuffle() }
+        questions.value!!.shuffle()
     }
 
-    fun doQuiz(numOfQuestions: Int): MutableList<Question> {
+    fun doQuiz(numOfQuestions: Int) {
         this.randomizeQuestions()
-        val questionsToBeShown = questions.subList(0, numOfQuestions);
-        return questionsToBeShown
+        val questionsToBeShown = questions.value!!.subList(0, numOfQuestions);
+        itQuestion =  questionsToBeShown.iterator()
     }
 
     fun getNextQuestion() {
@@ -37,7 +45,28 @@ class QuizViewModel : ViewModel() {
 
     fun resetQuiz() {
         numCorrect = 0
-        itQuestion = doQuiz(5).iterator()
+        doQuiz(numberOfQuestions)
+    }
+    fun deleteQuestion(pos:Int){
+        questions.value!!.removeAt(pos)
+    }
+    fun selectQuestion(pos:Int){
+        selectedQuestion.value = questions.value!![pos]
+    }
+
+    fun getQuestionsFromAPI(amount : Int) {
+        viewModelScope.launch {
+            val questionss = RetrofitInstance.api.getQuestions(amount);
+            Log.d("QUESTIONS", questionss.body()?.results.toString())
+            val questionsFromApi: MutableList<Question> = mutableListOf()
+            questionss.body()?.results?.forEach { it ->
+                Log.d("QUESTIONS", it.toString())
+                val answers: MutableList<String> = it.incorrectAnswers as MutableList<String>
+                answers.add(it.correctAnswer)
+                questionsFromApi.add(Question(it.question, answers, it.correctAnswer))
+            }
+            questions.value = questionsFromApi
+        }
     }
 }
 
