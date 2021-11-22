@@ -29,9 +29,9 @@ class MainActivity : AppCompatActivity() {
             when(menuItem.itemId){
                 R.id.home -> replaceFragment(R.id.fragment_container_view,HomeFragment())
                 R.id.quiz -> replaceFragment(R.id.fragment_container_view,QuizStartFragment())
-                R.id.profile -> replaceFragment(R.id.fragment_container_view,QuizStartFragment())
+                R.id.profile -> replaceFragment(R.id.fragment_container_view,ProfileFragment())
                 R.id.listOfQuestions -> replaceFragment(R.id.fragment_container_view,QuestionListFragment())
-                R.id.newQuestion -> replaceFragment(R.id.fragment_container_view,QuizStartFragment())
+                R.id.newQuestion -> replaceFragment(R.id.fragment_container_view,QuestionNewFragment())
                 else -> replaceFragment(R.id.fragment_container_view,HomeFragment())
             }
             drawerLayout.closeDrawer(Gravity.LEFT);

@@ -39,7 +39,7 @@ class HomeFragment : Fragment() {
             (activity as MainActivity).replaceFragment(R.id.fragment_container_view,QuestionListFragment())
         }
         binding.buttonCreateQuestion.setOnClickListener{
-            (activity as MainActivity).replaceFragment(R.id.fragment_container_view,QuizStartFragment())
+            (activity as MainActivity).replaceFragment(R.id.fragment_container_view,QuestionNewFragment())
         }
     }
 

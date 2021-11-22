@@ -26,6 +26,7 @@ class QuestionListFragment : Fragment() {
 
         override fun onDetailsClicked(pos: Int) {
             viewModel.selectQuestion(pos)
+            (activity as MainActivity).replaceFragment(R.id.fragment_container_view,QuestionDetailFragment())
         }
 
     }

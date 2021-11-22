@@ -14,12 +14,14 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.ViewModelProvider
 import com.example.android_lab3quiz.databinding.FragmentQuizStartBinding
+import quiz.QuizViewModel
 
 
 class QuizStartFragment : Fragment() {
-
-    lateinit var binding: FragmentQuizStartBinding;
+    private lateinit var viewModel : QuizViewModel
+    lateinit var binding: FragmentQuizStartBinding
     private val getContent: ActivityResultLauncher<Void> =
         registerForActivityResult(ActivityResultContracts.PickContact()) { uri: Uri ->
             val cursor: Cursor? = requireActivity().contentResolver.query(uri, null, null, null)
@@ -36,6 +38,7 @@ class QuizStartFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        viewModel = ViewModelProvider(requireActivity())[QuizViewModel::class.java]
         binding = FragmentQuizStartBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -51,6 +54,7 @@ class QuizStartFragment : Fragment() {
                 fragmentTransaction.replace(R.id.fragment_container_view,QuestionFragment());
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit()
+                viewModel.userName = name
             }
         }
         contactsButton.setOnClickListener {

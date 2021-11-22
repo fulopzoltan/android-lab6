@@ -17,10 +17,12 @@ class QuizViewModel : ViewModel() {
     var itQuestion: MutableIterator<Question> = quiz.questions.iterator()
     var currentQuestion: MutableLiveData<Pair<Question?, Boolean>> =
         MutableLiveData<Pair<Question?, Boolean>>()
+    var bestScore: Int = 0
+    var userName: String = "Please start a game first"
+    var selectedQuestion: MutableLiveData<Question> = MutableLiveData<Question>();
 
-    private var selectedQuestion : MutableLiveData<Question> = MutableLiveData<Question>();
     init {
-       getQuestionsFromAPI(20)
+        getQuestionsFromAPI(20)
         numberOfQuestions = questions.value!!.size
         getNextQuestion()
         selectQuestion(0)
@@ -34,7 +36,7 @@ class QuizViewModel : ViewModel() {
     fun doQuiz(numOfQuestions: Int) {
         this.randomizeQuestions()
         val questionsToBeShown = questions.value!!.subList(0, numOfQuestions);
-        itQuestion =  questionsToBeShown.iterator()
+        itQuestion = questionsToBeShown.iterator()
     }
 
     fun getNextQuestion() {
@@ -47,14 +49,16 @@ class QuizViewModel : ViewModel() {
         numCorrect = 0
         doQuiz(numberOfQuestions)
     }
-    fun deleteQuestion(pos:Int){
+
+    fun deleteQuestion(pos: Int) {
         questions.value!!.removeAt(pos)
     }
-    fun selectQuestion(pos:Int){
+
+    fun selectQuestion(pos: Int) {
         selectedQuestion.value = questions.value!![pos]
     }
 
-    fun getQuestionsFromAPI(amount : Int) {
+    fun getQuestionsFromAPI(amount: Int) {
         viewModelScope.launch {
             val questionss = RetrofitInstance.api.getQuestions(amount);
             Log.d("QUESTIONS", questionss.body()?.results.toString())
@@ -66,17 +70,15 @@ class QuizViewModel : ViewModel() {
                 questionsFromApi.add(Question(it.question, answers, it.correctAnswer))
             }
             questions.value = questionsFromApi
+            doQuiz(4)
+            getNextQuestion()
         }
     }
+
+    fun addQuestion(question: Question) {
+        questions.value?.add(0,question)
+    }
 }
-
-
-
-
-
-
-
-
 
 
 
